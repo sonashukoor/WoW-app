@@ -1,215 +1,175 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:syncfusion_flutter_charts/charts.dart';
 
-enum Mood { happy, neutral, sad, excited, tired }
-
-class MoodTrackingApp extends StatefulWidget {
+class MoodAnalyticsPage extends StatefulWidget {
   @override
-  _MoodTrackingAppState createState() => _MoodTrackingAppState();
+  _MoodAnalyticsPageState createState() => _MoodAnalyticsPageState();
 }
 
-class _MoodTrackingAppState extends State<MoodTrackingApp> {
-  Map<DateTime, Mood> moodRecords = {};
+class _MoodAnalyticsPageState extends State<MoodAnalyticsPage> {
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
 
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _showMoodSelectionPopup();
-    });
-  }
+  // Mock mood data - replace with actual database or state management
+  Map<DateTime, String> _moodData = {
+    DateTime(2025, 1, 15): '😊',
+    DateTime(2025, 1, 16): '😢',
+    DateTime(2025, 1, 17): '😡',
+    DateTime(2025, 1, 18): '😴',
+    DateTime(2025, 1, 19): '🤩',
+  };
 
-  void _showMoodSelectionPopup() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('How are you feeling today?'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: Mood.values
-                .map((mood) => ListTile(
-                      leading: Text(_getMoodEmoji(mood),
-                          style: const TextStyle(fontSize: 24)),
-                      title: Text(_getMoodString(mood)),
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        _recordMood(mood);
-                      },
-                    ))
-                .toList(),
-          ),
-        );
-      },
-    );
-  }
-
-  void _recordMood(Mood mood) {
-    setState(() {
-      moodRecords[DateTime.now()] = mood;
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Mood recorded: ${_getMoodString(mood)}')),
-    );
-  }
-
-  String _getMoodString(Mood mood) {
-    switch (mood) {
-      case Mood.happy:
-        return '😊 Happy';
-      case Mood.neutral:
-        return '😐 Neutral';
-      case Mood.sad:
-        return '😢 Sad';
-      case Mood.excited:
-        return '🎉 Excited';
-      case Mood.tired:
-        return '😴 Tired';
-    }
-  }
-
-  String _getMoodEmoji(Mood mood) {
-    switch (mood) {
-      case Mood.happy:
-        return '😊';
-      case Mood.neutral:
-        return '😐';
-      case Mood.sad:
-        return '😢';
-      case Mood.excited:
-        return '🎉';
-      case Mood.tired:
-        return '😴';
-    }
-  }
+  // Mapping of mood emoticons
+  final Map<String, String> _moodEmoticons = {
+    'happy': '😊',
+    'sad': '😢',
+    'angry': '😡',
+    'tired': '😴',
+    'neutral': '😐',
+    'anxious': '😰',
+    'excited': '🤩'
+  };
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mood Tracker'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.analytics),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        MoodAnalyticsPage(moodRecords: moodRecords)),
-              );
-            },
-          ),
-        ],
+        title: Text('Mood Analytics'),
       ),
       body: Column(
         children: [
           TableCalendar(
-            firstDay: DateTime.utc(2020, 1, 1),
-            lastDay: DateTime.utc(2050, 12, 31),
+            firstDay: DateTime.utc(2010, 10, 16),
+            lastDay: DateTime.utc(2030, 3, 14),
             focusedDay: _focusedDay,
             calendarFormat: _calendarFormat,
-            selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+            selectedDayPredicate: (day) {
+              return isSameDay(_selectedDay, day);
+            },
             onDaySelected: (selectedDay, focusedDay) {
-              setState(() {
-                _selectedDay = selectedDay;
-                _focusedDay = focusedDay;
-              });
+              if (!isSameDay(_selectedDay, selectedDay)) {
+                setState(() {
+                  _selectedDay = selectedDay;
+                  _focusedDay = focusedDay;
+                });
+                _showDayMoodDetails(selectedDay);
+              }
             },
             onFormatChanged: (format) {
               if (_calendarFormat != format) {
-                setState(() => _calendarFormat = format);
+                setState(() {
+                  _calendarFormat = format;
+                });
               }
             },
+            onPageChanged: (focusedDay) {
+              _focusedDay = focusedDay;
+            },
             calendarBuilders: CalendarBuilders(
-              defaultBuilder: (context, day, _) {
-                final mood = moodRecords[day];
-                if (mood != null) {
-                  return Center(
-                    child: Text(
-                      _getMoodEmoji(mood),
-                      style: const TextStyle(fontSize: 20),
-                    ),
-                  );
-                }
-                return null;
+              defaultBuilder: (context, day, focusedDay) {
+                String? mood =
+                    _moodData[DateTime(day.year, day.month, day.day)];
+                return Center(
+                  child: Text(
+                    day.day.toString(),
+                    style: TextStyle(color: Colors.black),
+                    textAlign: TextAlign.center,
+                  ),
+                );
+              },
+              markerBuilder: (context, day, events) {
+                String? mood =
+                    _moodData[DateTime(day.year, day.month, day.day)];
+                return mood != null
+                    ? Center(
+                        child: Text(
+                          mood,
+                          style: TextStyle(fontSize: 20),
+                        ),
+                      )
+                    : Container();
               },
             ),
           ),
-          const SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: _showMoodSelectionPopup,
-            child: const Text("Log Today's Mood"),
-          ),
+          Expanded(
+            child: _buildMoodSummary(),
+          )
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        onPressed: () {
+          // Add mood entry functionality
+          _showAddMoodDialog();
+        },
+      ),
+    );
+  }
+
+  Widget _buildMoodSummary() {
+    // Count mood occurrences
+    Map<String, int> moodCounts = {};
+    _moodData.values.forEach((mood) {
+      moodCounts[mood] = (moodCounts[mood] ?? 0) + 1;
+    });
+
+    return ListView(
+      children: [
+        Text(
+          'Mood Summary',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          textAlign: TextAlign.center,
+        ),
+        ...moodCounts.entries
+            .map((entry) => ListTile(
+                  title: Text('${entry.key}: ${entry.value} days'),
+                ))
+            .toList(),
+      ],
+    );
+  }
+
+  void _showDayMoodDetails(DateTime selectedDay) {
+    String? mood = _moodData[selectedDay];
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Mood on ${selectedDay.toLocal()}'),
+        content: mood != null
+            ? Text('Mood: $mood')
+            : Text('No mood recorded for this day'),
+        actions: [
+          TextButton(
+            child: Text('Close'),
+            onPressed: () => Navigator.of(context).pop(),
+          )
         ],
       ),
     );
   }
-}
 
-class MoodAnalyticsPage extends StatelessWidget {
-  final Map<DateTime, Mood> moodRecords;
-
-  const MoodAnalyticsPage({Key? key, required this.moodRecords})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    // Count mood frequencies
-    final Map<Mood, int> moodCounts = {
-      Mood.happy: 0,
-      Mood.neutral: 0,
-      Mood.sad: 0,
-      Mood.excited: 0,
-      Mood.tired: 0,
-    };
-
-    for (var mood in moodRecords.values) {
-      moodCounts[mood] = (moodCounts[mood] ?? 0) + 1;
-    }
-
-    // Prepare data for charts
-    final List<ChartData> chartData = [
-      ChartData('Happy', moodCounts[Mood.happy]!, Colors.green),
-      ChartData('Neutral', moodCounts[Mood.neutral]!, Colors.blue),
-      ChartData('Sad', moodCounts[Mood.sad]!, Colors.red),
-      ChartData('Excited', moodCounts[Mood.excited]!, Colors.purple),
-      ChartData('Tired', moodCounts[Mood.tired]!, Colors.orange),
-    ];
-
-    return Scaffold(
-      appBar: AppBar(title: const Text('Mood Analytics')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SfCartesianChart(
-          primaryXAxis: CategoryAxis(),
-          title: ChartTitle(text: 'Mood Distribution'),
-          legend: Legend(isVisible: true),
-          tooltipBehavior: TooltipBehavior(enable: true),
-          series: <CartesianSeries>[
-            ColumnSeries<ChartData, String>(
-              dataSource: chartData,
-              xValueMapper: (ChartData data, _) => data.x,
-              yValueMapper: (ChartData data, _) => data.y,
-              pointColorMapper: (ChartData data, _) => data.color,
-              dataLabelSettings: const DataLabelSettings(isVisible: true),
-            )
-          ],
+  void _showAddMoodDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Add Mood'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: _moodEmoticons.entries
+              .map((entry) => ListTile(
+                    title: Text(entry.key),
+                    trailing: Text(entry.value),
+                    onTap: () {
+                      setState(() {
+                        _moodData[DateTime.now()] = entry.value;
+                      });
+                      Navigator.of(context).pop();
+                    },
+                  ))
+              .toList(),
         ),
       ),
     );
   }
-}
-
-class ChartData {
-  final String x;
-  final int y;
-  final Color color;
-
-  ChartData(this.x, this.y, this.color);
 }
