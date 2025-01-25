@@ -36,7 +36,6 @@ class _PredictionButtonState extends State<PredictionButton> {
 
         final result = jsonDecode(response.body);
         setState(() {
-          // Assuming 'prediction' key exists in response
           _prediction = result['prediction'] ?? 'No prediction received';
         });
       } else {
@@ -56,7 +55,7 @@ class _PredictionButtonState extends State<PredictionButton> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Mood Tracker App')),
+      appBar: AppBar(title: Text('Stress Level Analysis')),
       body: Padding(
         padding: EdgeInsets.all(16.0),
         child: Column(
