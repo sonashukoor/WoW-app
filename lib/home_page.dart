@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'login_page.dart';
 import 'moodtrack.dart'; // Import the MoodTrackPage
+import 'stresslevel.dart';
 
 class HomePage extends StatelessWidget {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -40,6 +41,16 @@ class HomePage extends StatelessWidget {
                 );
               },
               child: Text("Go to Mood Tracker"),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => PredictionButton()), // Navigate to StressLevelPage
+                );
+              },
+              child: Text("Go to Stress Level Tracker"), // Button text
             ),
           ],
         ),
