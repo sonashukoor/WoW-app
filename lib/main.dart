@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'moodtrack.dart'; // Ensure this import matches your file name
+import 'package:wow_app/moodtrack.dart'; // Ensure this import is correct
 
 void main() {
   runApp(MyApp());
@@ -9,12 +9,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Mood Tracker App',
+      title: 'WoW App',
       theme: ThemeData(
         primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MoodTrackingApp(), // Changed to MoodTrackingApp
+      home:
+          MoodAnalyticsPage(), // Changed to MoodAnalyticsPage from the moodtrack.dart file
     );
   }
 }
