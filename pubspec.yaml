@@ -25,3 +25,9 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/images/happy.png
+    - assets/images/sad.png
+    - assets/images/angry.png
+    - assets/images/tired.png
+    - assets/images/excited.png
