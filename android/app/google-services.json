@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "929698661622",
+    "project_id": "wow-app-8e32b",
+    "storage_bucket": "wow-app-8e32b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:929698661622:android:a9317be87a5da9143598d7",
+        "android_client_info": {
+          "package_name": "com.example.wow_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyApWsnfwpV5p7q8AMvE8DJ8sInLAPnEFVk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

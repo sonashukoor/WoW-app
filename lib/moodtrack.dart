@@ -13,11 +13,11 @@ class _MoodAnalyticsPageState extends State<MoodAnalyticsPage> {
 
   // Mock mood data - replace with actual database or state management
   Map<DateTime, String> _moodData = {
-    DateTime(2024, 1, 15): '😊',
-    DateTime(2024, 1, 16): '😢',
-    DateTime(2024, 1, 17): '😡',
-    DateTime(2024, 1, 18): '😴',
-    DateTime(2024, 1, 19): '🤔',
+    DateTime(2025, 1, 15): '😊',
+    DateTime(2025, 1, 16): '😢',
+    DateTime(2025, 1, 17): '😡',
+    DateTime(2025, 1, 18): '😴',
+    DateTime(2025, 1, 19): '🤩',
   };
 
   // Mapping of mood emoticons
