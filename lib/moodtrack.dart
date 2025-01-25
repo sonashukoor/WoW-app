@@ -29,19 +29,20 @@ class _MoodTrackingAppState extends State<MoodTrackingApp> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('How are you feeling today?'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: Mood.values
-                  .map((mood) => ListTile(
-                        title: Text(_getMoodString(mood)),
-                        onTap: () {
-                          Navigator.of(context).pop();
-                          _recordMood(mood);
-                        },
-                      ))
-                  .toList(),
-            ),
+          title: const Text('How are you feeling today?'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: Mood.values
+                .map((mood) => ListTile(
+                      leading: Text(_getMoodEmoji(mood),
+                          style: const TextStyle(fontSize: 24)),
+                      title: Text(_getMoodString(mood)),
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        _recordMood(mood);
+                      },
+                    ))
+                .toList(),
           ),
         );
       },
@@ -52,6 +53,9 @@ class _MoodTrackingAppState extends State<MoodTrackingApp> {
     setState(() {
       moodRecords[DateTime.now()] = mood;
     });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Mood recorded: ${_getMoodString(mood)}')),
+    );
   }
 
   String _getMoodString(Mood mood) {
@@ -88,10 +92,10 @@ class _MoodTrackingAppState extends State<MoodTrackingApp> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Mood Tracker'),
+        title: const Text('Mood Tracker'),
         actions: [
           IconButton(
-            icon: Icon(Icons.analytics),
+            icon: const Icon(Icons.analytics),
             onPressed: () {
               Navigator.push(
                 context,
@@ -100,42 +104,36 @@ class _MoodTrackingAppState extends State<MoodTrackingApp> {
                         MoodAnalyticsPage(moodRecords: moodRecords)),
               );
             },
-          )
+          ),
         ],
       ),
       body: Column(
         children: [
           TableCalendar(
-            firstDay: DateTime.utc(2010, 10, 16),
-            lastDay: DateTime.utc(2030, 3, 14),
+            firstDay: DateTime.utc(2020, 1, 1),
+            lastDay: DateTime.utc(2050, 12, 31),
             focusedDay: _focusedDay,
             calendarFormat: _calendarFormat,
-            selectedDayPredicate: (day) {
-              return isSameDay(_selectedDay, day);
-            },
+            selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
             onDaySelected: (selectedDay, focusedDay) {
-              if (!isSameDay(_selectedDay, selectedDay)) {
-                setState(() {
-                  _selectedDay = selectedDay;
-                  _focusedDay = focusedDay;
-                });
-              }
+              setState(() {
+                _selectedDay = selectedDay;
+                _focusedDay = focusedDay;
+              });
             },
             onFormatChanged: (format) {
               if (_calendarFormat != format) {
-                setState(() {
-                  _calendarFormat = format;
-                });
+                setState(() => _calendarFormat = format);
               }
             },
             calendarBuilders: CalendarBuilders(
-              defaultBuilder: (context, day, focusedDay) {
+              defaultBuilder: (context, day, _) {
                 final mood = moodRecords[day];
                 if (mood != null) {
                   return Center(
                     child: Text(
                       _getMoodEmoji(mood),
-                      style: TextStyle(fontSize: 20),
+                      style: const TextStyle(fontSize: 20),
                     ),
                   );
                 }
@@ -143,9 +141,10 @@ class _MoodTrackingAppState extends State<MoodTrackingApp> {
               },
             ),
           ),
+          const SizedBox(height: 20),
           ElevatedButton(
-            child: Text('Log Today\'s Mood'),
             onPressed: _showMoodSelectionPopup,
+            child: const Text("Log Today's Mood"),
           ),
         ],
       ),
@@ -156,12 +155,13 @@ class _MoodTrackingAppState extends State<MoodTrackingApp> {
 class MoodAnalyticsPage extends StatelessWidget {
   final Map<DateTime, Mood> moodRecords;
 
-  MoodAnalyticsPage({required this.moodRecords});
+  const MoodAnalyticsPage({Key? key, required this.moodRecords})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     // Count mood frequencies
-    Map<Mood, int> moodCounts = {
+    final Map<Mood, int> moodCounts = {
       Mood.happy: 0,
       Mood.neutral: 0,
       Mood.sad: 0,
@@ -169,9 +169,9 @@ class MoodAnalyticsPage extends StatelessWidget {
       Mood.tired: 0,
     };
 
-    moodRecords.forEach((date, mood) {
+    for (var mood in moodRecords.values) {
       moodCounts[mood] = (moodCounts[mood] ?? 0) + 1;
-    });
+    }
 
     // Prepare data for charts
     final List<ChartData> chartData = [
@@ -183,18 +183,21 @@ class MoodAnalyticsPage extends StatelessWidget {
     ];
 
     return Scaffold(
-      appBar: AppBar(title: Text('Mood Analytics')),
-      body: Center(
+      appBar: AppBar(title: const Text('Mood Analytics')),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
         child: SfCartesianChart(
           primaryXAxis: CategoryAxis(),
           title: ChartTitle(text: 'Mood Distribution'),
+          legend: Legend(isVisible: true),
+          tooltipBehavior: TooltipBehavior(enable: true),
           series: <CartesianSeries>[
             ColumnSeries<ChartData, String>(
               dataSource: chartData,
               xValueMapper: (ChartData data, _) => data.x,
               yValueMapper: (ChartData data, _) => data.y,
               pointColorMapper: (ChartData data, _) => data.color,
-              dataLabelSettings: DataLabelSettings(isVisible: true),
+              dataLabelSettings: const DataLabelSettings(isVisible: true),
             )
           ],
         ),
