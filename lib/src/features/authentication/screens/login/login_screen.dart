@@ -3,7 +3,7 @@ import 'package:wow_app/src/constants/image_strings.dart';
 import 'package:wow_app/src/constants/text_strings.dart';
 
 class LoginScreen extends StatelessWidget {
-  const LoginScreen({Key? key});
+  const LoginScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

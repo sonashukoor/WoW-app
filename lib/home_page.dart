@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'login_page.dart';
+import 'moodtrack.dart'; // Import the MoodTrackPage
 
 class HomePage extends StatelessWidget {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -26,7 +27,22 @@ class HomePage extends StatelessWidget {
         ],
       ),
       body: Center(
-        child: Text("Welcome!"),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text("Welcome!"),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => MoodTrackingApp()),
+                );
+              },
+              child: Text("Go to Mood Tracker"),
+            ),
+          ],
+        ),
       ),
     );
   }

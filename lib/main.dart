@@ -1,7 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:wow_app/login_page.dart';
-import 'package:wow_app/src/features/authentication/screens/login/login_screen.dart';
+import 'package:wow_app/login_page.dart'; // Ensure correct import
+import 'package:wow_app/moodtrack.dart'; // Ensure correct import
 import 'firebase_options.dart';
 
 void main() async {
@@ -9,7 +9,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -19,9 +19,15 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        body: LoginPage(),
+      title: 'Mood Tracker App',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
+      home: const LoginPage(), // Start with login
+      routes: {
+        '/moodtracker': (context) => MoodTrackingApp(),
+      },
     );
   }
 }
