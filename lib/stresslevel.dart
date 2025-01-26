@@ -62,7 +62,8 @@ class _PredictionButtonState extends State<PredictionButton> {
           children: [
             TextField(
               controller: _genderController,
-              decoration: InputDecoration(labelText: "Gender (1 = Male, 0 = Female)"),
+              decoration:
+                  InputDecoration(labelText: "Gender (1 = Male, 0 = Female)"),
               keyboardType: TextInputType.number,
             ),
             TextField(
@@ -72,7 +73,8 @@ class _PredictionButtonState extends State<PredictionButton> {
             ),
             TextField(
               controller: _occupationController,
-              decoration: InputDecoration(labelText: "Occupation (Enter code for occupation)"),
+              decoration: InputDecoration(
+                  labelText: "Occupation (Enter code for occupation)"),
               keyboardType: TextInputType.number,
             ),
             TextField(
