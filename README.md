@@ -58,31 +58,39 @@ For Software:
 
 # Screenshots (Add at least 3)
 ![Alt text](https://github.com/user-attachments/assets/fa623927-9a0c-4c5b-95b9-e4b3aedb2c44)
+Mood per day
 ![Alt text](https://github.com/user-attachments/assets/18a45189-47e8-482f-95f0-b792b39b99a0)
+Today's Mood 
 ![Alt text](https://github.com/user-attachments/assets/9191379c-8efe-43c2-9901-35c2c3d4b060)
+Guide for stress prediction
 ![Alt text](https://github.com/user-attachments/assets/8bca1a68-fdb4-4527-81e7-ffab6e6b1094)
+Stress Prediction
 ![Alt text](https://github.com/user-attachments/assets/63db5808-f4f2-4517-9147-ccb4e63dfa8d)
+Time Tracking
 ![Alt text](https://github.com/user-attachments/assets/da2d10ca-f08b-4a07-af75-3b4d9aa0eed7)
+Mood Analytics
 ![Alt text](https://github.com/user-attachments/assets/499e7418-2676-4ae4-aca3-d66fd57c21eb)
+Home Page
 ![Alt text](https://github.com/user-attachments/assets/08a2adcf-228d-46d6-b32e-c643619814b7)
+Sign Up
 ![Alt text](https://github.com/user-attachments/assets/6cdc7f73-afe4-4508-82e6-60e1cc13a9d9)
-![Alt text](https://github.com/user-attachments/assets/ffe8e507-282c-4676-9655-7ca72962d0c6)
+Landing Page
 ![Alt text](https://github.com/user-attachments/assets/4f72075d-164b-403a-9787-40894496c2b5)
+LogIn
+
 
 
 
 # Diagrams
-![Workflow](Add your workflow/architecture diagram here)
-*Add caption explaining your workflow*
+![Workflow](https://github.com/user-attachments/assets/539fa2f3-b651-4564-8e86-dc9c1c0f023f)
+User Flow
 
 
 ### Project Demo
 # Video
-[Add your demo video link here]
-*Explain what the video demonstrates*
+https://drive.google.com/drive/folders/1PPVyaOAAVzRX1jXM0lYjGhMh7QQxfQlq?usp=sharing 
 
-# Additional Demos
-[Add any extra demo materials/links]
+
 
 ## Team Contributions
 - Arathy S: Mood Tracking and Analytics
