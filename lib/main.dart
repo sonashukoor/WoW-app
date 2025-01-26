@@ -1,8 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:wow_app/getstarted.dart';
+import 'package:wow_app/moodtrack.dart'; // Ensure this import is correct
 import 'package:wow_app/login_page.dart'; // Ensure correct import
-import 'package:wow_app/moodtrack.dart'; // Ensure correct import
 import 'firebase_options.dart';
 
 void main() async {
@@ -20,15 +20,14 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Mood Tracker App',
+      title: 'WoW App',
       theme: ThemeData(
         primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: const WelcomePage(), // Start with Welcome Page
       routes: {
         '/login': (context) => const LoginPage(), // Ensure LoginPage exists
-        '/moodtracker': (context) => MoodTrackingApp(),
+        '/moodtracker': (context) => MoodAnalyticsPage(),
       },
     );
   }
