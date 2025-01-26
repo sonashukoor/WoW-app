@@ -80,38 +80,62 @@ class _MoodAnalyticsPageState extends State<MoodAnalyticsPage> {
                 final normalizedDay = DateTime(day.year, day.month, day.day);
 
                 // Find the mood for this specific day
-                final mood = _moodData.entries
-                    .firstWhere(
-                      (entry) =>
-                          entry.key.year == normalizedDay.year &&
-                          entry.key.month == normalizedDay.month &&
-                          entry.key.day == normalizedDay.day,
-                      orElse: () => MapEntry(normalizedDay, ''),
-                    )
-                    .value;
+                final mood = _moodData[normalizedDay];
 
-                return Center(
-                  child: Container(
-                    width: 45,
-                    height: 45,
-                    decoration: BoxDecoration(
-                      color: const Color.fromARGB(255, 243, 240, 240),
-                      shape: BoxShape.circle,
+                // Build the day cell with or without the emoticon
+                return Stack(
+                  children: [
+                    Center(
+                      child: Text(
+                        day.day.toString(),
+                        style: TextStyle(color: Colors.black),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
-                    alignment: Alignment.center,
-                    child: mood.isNotEmpty
-                        ? Image.asset(
+                    if (mood != null)
+                      Align(
+                        alignment: Alignment.topCenter,
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 2.0),
+                          child: Image.asset(
                             _moodEmoticons[mood]!,
-                            width: 40,
-                            height: 40,
+                            width: 30,
+                            height: 30,
                             fit: BoxFit.contain,
-                          )
-                        : Text(
-                            day.day.toString(),
-                            style: TextStyle(color: Colors.black),
-                            textAlign: TextAlign.center,
                           ),
-                  ),
+                        ),
+                      ),
+                  ],
+                );
+              },
+              selectedBuilder: (context, day, focusedDay) {
+                // Same logic as defaultBuilder, but styled for selected days
+                final normalizedDay = DateTime(day.year, day.month, day.day);
+                final mood = _moodData[normalizedDay];
+
+                return Stack(
+                  children: [
+                    Center(
+                      child: Text(
+                        day.day.toString(),
+                        style: TextStyle(color: Colors.white),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    if (mood != null)
+                      Align(
+                        alignment: Alignment.topCenter,
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 2.0),
+                          child: Image.asset(
+                            _moodEmoticons[mood]!,
+                            width: 30,
+                            height: 30,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                      ),
+                  ],
                 );
               },
             ),
@@ -229,7 +253,6 @@ class _MoodAnalyticsPageState extends State<MoodAnalyticsPage> {
                       DateTime today = DateTime.now();
                       final normalizedToday =
                           DateTime(today.year, today.month, today.day);
-
                       setState(() {
                         // Add new mood for today
                         _moodData[normalizedToday] = entry.key;
