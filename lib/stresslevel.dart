@@ -18,6 +18,7 @@ class _PredictionButtonState extends State<PredictionButton> {
   final TextEditingController _bpController = TextEditingController();
 
   String _prediction = '';
+  String _uniqueId = '';  // New state variable to store the unique ID
 
   // Function to send data to the backend and get the prediction
   Future<void> getPrediction(Map<String, dynamic> userInput) async {
@@ -35,8 +36,11 @@ class _PredictionButtonState extends State<PredictionButton> {
         print('Response body: ${response.body}');
 
         final result = jsonDecode(response.body);
+        print('Decoded Response: $result');
         setState(() {
           _prediction = result['prediction'] ?? 'No prediction received';
+          _uniqueId = result['id'] ?? 'No ID received';  // Capture the unique ID
+          
         });
       } else {
         setState(() {
