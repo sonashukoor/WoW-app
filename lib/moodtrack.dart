@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 
 class MoodAnalyticsPage extends StatefulWidget {
   @override
@@ -13,11 +14,11 @@ class _MoodAnalyticsPageState extends State<MoodAnalyticsPage> {
 
   // Mock mood data - replace with actual database or state management
   Map<DateTime, String> _moodData = {
-    DateTime(2025, 1, 15): 'assets/images/happy.png',
-    DateTime(2025, 1, 16): 'assets/images/sad.png',
-    DateTime(2025, 1, 17): 'assets/images/angry.png',
-    DateTime(2025, 1, 18): 'assets/images/tired.png',
-    DateTime(2025, 1, 19): 'assets/images/excited.png',
+    DateTime(2025, 1, 15): 'happy',
+    DateTime(2025, 1, 16): 'sad',
+    DateTime(2025, 1, 17): 'angry',
+    DateTime(2025, 1, 18): 'tired',
+    DateTime(2025, 1, 19): 'excited',
   };
 
   // Mapping of mood emoticons
@@ -27,6 +28,15 @@ class _MoodAnalyticsPageState extends State<MoodAnalyticsPage> {
     'angry': 'assets/images/angry.png',
     'tired': 'assets/images/tired.png',
     'excited': 'assets/images/excited.png'
+  };
+
+  // Color mapping for moods
+  final Map<String, Color> _moodColors = {
+    'happy': const Color.fromARGB(255, 241, 192, 15),
+    'sad': const Color.fromARGB(255, 78, 212, 65),
+    'angry': Colors.red,
+    'tired': const Color.fromARGB(255, 41, 205, 226),
+    'excited': const Color.fromARGB(255, 171, 60, 204),
   };
 
   @override
@@ -66,33 +76,38 @@ class _MoodAnalyticsPageState extends State<MoodAnalyticsPage> {
             },
             calendarBuilders: CalendarBuilders(
               defaultBuilder: (context, day, focusedDay) {
-                // Fetch the mood image path for the given day
-                final moodImagePath =
-                    _moodData[DateTime(day.year, day.month, day.day)];
+                // Normalize the day to remove time components
+                final normalizedDay = DateTime(day.year, day.month, day.day);
+
+                // Find the mood for this specific day
+                final mood = _moodData.entries
+                    .firstWhere(
+                      (entry) =>
+                          entry.key.year == normalizedDay.year &&
+                          entry.key.month == normalizedDay.month &&
+                          entry.key.day == normalizedDay.day,
+                      orElse: () => MapEntry(normalizedDay, ''),
+                    )
+                    .value;
 
                 return Center(
                   child: Container(
-                    width: 45, // Adjust the size of the background
+                    width: 45,
                     height: 45,
                     decoration: BoxDecoration(
-                      color: Colors.white, // White background
-                      shape: BoxShape.circle, // Circular background
+                      color: const Color.fromARGB(255, 243, 240, 240),
+                      shape: BoxShape.circle,
                     ),
-                    alignment: Alignment
-                        .center, // Centers the content within the circle
-                    child: moodImagePath != null
-                        ? Padding(
-                            padding: const EdgeInsets.all(
-                                4.0), // Add padding for the image
-                            child: Image.asset(
-                              moodImagePath, // Load image from assets
-                              fit: BoxFit
-                                  .contain, // Ensure it fits within the circle
-                            ),
+                    alignment: Alignment.center,
+                    child: mood.isNotEmpty
+                        ? Image.asset(
+                            _moodEmoticons[mood]!,
+                            width: 40,
+                            height: 40,
+                            fit: BoxFit.contain,
                           )
                         : Text(
-                            day.day
-                                .toString(), // Fallback: Displays the day of the month
+                            day.day.toString(),
                             style: TextStyle(color: Colors.black),
                             textAlign: TextAlign.center,
                           ),
@@ -102,72 +117,85 @@ class _MoodAnalyticsPageState extends State<MoodAnalyticsPage> {
             ),
           ),
           Expanded(
-            child: _buildMoodSummary(),
+            child: _buildMoodAnalyticsGraph(),
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
         onPressed: () {
-          // Add mood entry functionality
           _showAddMoodDialog();
         },
       ),
     );
   }
 
-  Widget _buildMoodSummary() {
-    // Count mood occurrences
-    Map<String, int> moodCounts = {};
+  Widget _buildMoodAnalyticsGraph() {
+    // Group moods by month
+    Map<String, Map<String, int>> monthlyMoodCounts = {};
 
-    _moodData.values.forEach((moodImagePath) {
-      // Extract mood label based on the image path
-      String mood = moodImagePath
-          .split('/')
-          .last
-          .split('.')
-          .first; // Example: happy.png => happy
-      moodCounts[mood] = (moodCounts[mood] ?? 0) + 1;
+    _moodData.forEach((date, mood) {
+      String monthKey = '${date.year}-${date.month}';
+      if (!monthlyMoodCounts.containsKey(monthKey)) {
+        monthlyMoodCounts[monthKey] = {};
+      }
+      monthlyMoodCounts[monthKey]![mood] =
+          (monthlyMoodCounts[monthKey]![mood] ?? 0) + 1;
     });
 
-    return ListView(
-      children: [
-        Text(
-          'Mood Summary',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          textAlign: TextAlign.center,
-        ),
-        ...moodCounts.entries
-            .map((entry) => ListTile(
-                  title: Row(
-                    children: [
-                      Image.asset(
-                        'assets/images/${entry.key}.png', // Assuming mood images are named like happy.png
-                        width: 20, // Adjust size of image
-                        height: 20,
-                      ),
-                      SizedBox(width: 8),
-                      Text('${entry.key}: ${entry.value} days'),
-                    ],
-                  ),
-                ))
-            .toList(),
-      ],
+    // Convert to chart data
+    List<MoodData> chartData = [];
+    monthlyMoodCounts.forEach((monthKey, moodCounts) {
+      moodCounts.forEach((mood, count) {
+        chartData.add(MoodData(mood, count, _moodColors[mood] ?? Colors.grey));
+      });
+    });
+
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: SfCartesianChart(
+        primaryXAxis: CategoryAxis(),
+        title: ChartTitle(text: 'Monthly Mood Distribution'),
+        legend: Legend(isVisible: true),
+        series: <CartesianSeries>[
+          ColumnSeries<MoodData, String>(
+            dataSource: chartData,
+            xValueMapper: (MoodData mood, _) => mood.mood,
+            yValueMapper: (MoodData mood, _) => mood.count,
+            pointColorMapper: (MoodData mood, _) => mood.color,
+            name: 'Mood Frequency',
+          )
+        ],
+      ),
     );
   }
 
   void _showDayMoodDetails(DateTime selectedDay) {
-    String? moodImagePath = _moodData[selectedDay];
+    // Normalize the day to remove time components
+    final normalizedDay =
+        DateTime(selectedDay.year, selectedDay.month, selectedDay.day);
+
+    // Find the mood for this specific day
+    final mood = _moodData.entries
+        .firstWhere(
+          (entry) =>
+              entry.key.year == normalizedDay.year &&
+              entry.key.month == normalizedDay.month &&
+              entry.key.day == normalizedDay.day,
+          orElse: () => MapEntry(normalizedDay, ''),
+        )
+        .value;
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Text('Mood on ${selectedDay.toLocal()}'),
-        content: moodImagePath != null
+        content: mood.isNotEmpty
             ? Image.asset(
-                moodImagePath, // Show the mood image
-                width: 50, // Adjust size as needed
-                height: 50,
-                fit: BoxFit.cover, // Ensure it fits well
+                _moodEmoticons[mood]!,
+                width: 70,
+                height: 70,
+                fit: BoxFit.cover,
               )
             : Text('No mood recorded for this day'),
         actions: [
@@ -190,15 +218,21 @@ class _MoodAnalyticsPageState extends State<MoodAnalyticsPage> {
           children: _moodEmoticons.entries
               .map((entry) => ListTile(
                     leading: Image.asset(
-                      entry.value, // Show the image next to the mood label
-                      width: 30, // Adjust size as needed
+                      entry.value,
+                      width: 30,
                       height: 30,
-                      fit: BoxFit.cover, // Ensure it fits well
+                      fit: BoxFit.cover,
                     ),
                     title: Text(entry.key),
                     onTap: () {
+                      // Use a normalized DateTime (stripped time components)
+                      DateTime today = DateTime.now();
+                      final normalizedToday =
+                          DateTime(today.year, today.month, today.day);
+
                       setState(() {
-                        _moodData[DateTime.now()] = entry.value;
+                        // Add new mood for today
+                        _moodData[normalizedToday] = entry.key;
                       });
                       Navigator.of(context).pop();
                     },
@@ -208,4 +242,11 @@ class _MoodAnalyticsPageState extends State<MoodAnalyticsPage> {
       ),
     );
   }
+}
+
+class MoodData {
+  final String mood;
+  final int count;
+  final Color color;
+  MoodData(this.mood, this.count, this.color);
 }
