@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:wow_app/getstarted.dart';
 import 'package:wow_app/moodtrack.dart'; // Ensure this import is correct
 import 'package:wow_app/login_page.dart'; // Ensure correct import
 import 'firebase_options.dart';
@@ -23,8 +24,9 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const LoginPage(), // Start with login
+      home: const WelcomePage(), // Start with Welcome Page
       routes: {
+        '/login': (context) => const LoginPage(), // Ensure LoginPage exists
         '/moodtracker': (context) => MoodAnalyticsPage(),
       },
     );

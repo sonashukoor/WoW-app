@@ -12,7 +12,6 @@ class _MoodAnalyticsPageState extends State<MoodAnalyticsPage> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
 
-  // Mock mood data - replace with actual database or state management
   Map<DateTime, String> _moodData = {
     DateTime(2025, 1, 15): 'happy',
     DateTime(2025, 1, 16): 'sad',
@@ -21,16 +20,14 @@ class _MoodAnalyticsPageState extends State<MoodAnalyticsPage> {
     DateTime(2025, 1, 19): 'excited',
   };
 
-  // Mapping of mood emoticons
   final Map<String, String> _moodEmoticons = {
     'happy': 'assets/images/happy.png',
     'sad': 'assets/images/sad.png',
     'angry': 'assets/images/angry.png',
     'tired': 'assets/images/tired.png',
-    'excited': 'assets/images/excited.png'
+    'excited': 'assets/images/excited.png',
   };
 
-  // Color mapping for moods
   final Map<String, Color> _moodColors = {
     'happy': const Color.fromARGB(255, 241, 192, 15),
     'sad': const Color.fromARGB(255, 78, 212, 65),
@@ -43,119 +40,89 @@ class _MoodAnalyticsPageState extends State<MoodAnalyticsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Mood Analytics'),
+        title: const Text(
+          'Mood Analytics',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: Colors.white,
+        centerTitle: true,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.black),
       ),
-      body: Column(
-        children: [
-          TableCalendar(
-            firstDay: DateTime.utc(2010, 10, 16),
-            lastDay: DateTime.utc(2030, 3, 14),
-            focusedDay: _focusedDay,
-            calendarFormat: _calendarFormat,
-            selectedDayPredicate: (day) {
-              return isSameDay(_selectedDay, day);
-            },
-            onDaySelected: (selectedDay, focusedDay) {
-              if (!isSameDay(_selectedDay, selectedDay)) {
+      body: Container(
+        color: Colors.white,
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            TableCalendar(
+              firstDay: DateTime.utc(2010, 10, 16),
+              lastDay: DateTime.utc(2030, 3, 14),
+              focusedDay: _focusedDay,
+              calendarFormat: _calendarFormat,
+              selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+              onDaySelected: (selectedDay, focusedDay) {
                 setState(() {
                   _selectedDay = selectedDay;
                   _focusedDay = focusedDay;
                 });
                 _showDayMoodDetails(selectedDay);
-              }
-            },
-            onFormatChanged: (format) {
-              if (_calendarFormat != format) {
+              },
+              onFormatChanged: (format) {
                 setState(() {
                   _calendarFormat = format;
                 });
-              }
-            },
-            onPageChanged: (focusedDay) {
-              _focusedDay = focusedDay;
-            },
-            calendarBuilders: CalendarBuilders(
-              defaultBuilder: (context, day, focusedDay) {
-                // Normalize the day to remove time components
-                final normalizedDay = DateTime(day.year, day.month, day.day);
+              },
+              onPageChanged: (focusedDay) {
+                _focusedDay = focusedDay;
+              },
+              calendarBuilders: CalendarBuilders(
+                defaultBuilder: (context, day, focusedDay) {
+                  final normalizedDay = DateTime(day.year, day.month, day.day);
+                  final mood = _moodData[normalizedDay];
 
-                // Find the mood for this specific day
-                final mood = _moodData[normalizedDay];
-
-                // Build the day cell with or without the emoticon
-                return Stack(
-                  children: [
-                    Center(
-                      child: Text(
-                        day.day.toString(),
-                        style: TextStyle(color: Colors.black),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    if (mood != null)
-                      Align(
-                        alignment: Alignment.topCenter,
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 2.0),
-                          child: Image.asset(
-                            _moodEmoticons[mood]!,
-                            width: 30,
-                            height: 30,
-                            fit: BoxFit.contain,
-                          ),
+                  return Stack(
+                    children: [
+                      Center(
+                        child: Text(
+                          day.day.toString(),
+                          style: const TextStyle(color: Colors.black),
                         ),
                       ),
-                  ],
-                );
-              },
-              selectedBuilder: (context, day, focusedDay) {
-                // Same logic as defaultBuilder, but styled for selected days
-                final normalizedDay = DateTime(day.year, day.month, day.day);
-                final mood = _moodData[normalizedDay];
-
-                return Stack(
-                  children: [
-                    Center(
-                      child: Text(
-                        day.day.toString(),
-                        style: TextStyle(color: Colors.white),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                    if (mood != null)
-                      Align(
-                        alignment: Alignment.topCenter,
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 2.0),
-                          child: Image.asset(
-                            _moodEmoticons[mood]!,
-                            width: 30,
-                            height: 30,
-                            fit: BoxFit.contain,
+                      if (mood != null)
+                        Align(
+                          alignment: Alignment.topCenter,
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 2.0),
+                            child: Image.asset(
+                              _moodEmoticons[mood]!,
+                              width: 30,
+                              height: 30,
+                            ),
                           ),
                         ),
-                      ),
-                  ],
-                );
-              },
+                    ],
+                  );
+                },
+              ),
             ),
-          ),
-          Expanded(
-            child: _buildMoodAnalyticsGraph(),
-          ),
-        ],
+            const SizedBox(height: 20),
+            Expanded(child: _buildMoodAnalyticsGraph()),
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
-        onPressed: () {
-          _showAddMoodDialog();
-        },
+        backgroundColor: const Color.fromARGB(255, 144, 102, 198),
+        child: const Icon(Icons.add, color: Colors.white),
+        onPressed: _showAddMoodDialog,
       ),
     );
   }
 
   Widget _buildMoodAnalyticsGraph() {
-    // Group moods by month
     Map<String, Map<String, int>> monthlyMoodCounts = {};
 
     _moodData.forEach((date, mood) {
@@ -167,7 +134,6 @@ class _MoodAnalyticsPageState extends State<MoodAnalyticsPage> {
           (monthlyMoodCounts[monthKey]![mood] ?? 0) + 1;
     });
 
-    // Convert to chart data
     List<MoodData> chartData = [];
     monthlyMoodCounts.forEach((monthKey, moodCounts) {
       moodCounts.forEach((mood, count) {
@@ -179,7 +145,14 @@ class _MoodAnalyticsPageState extends State<MoodAnalyticsPage> {
       padding: const EdgeInsets.all(8.0),
       child: SfCartesianChart(
         primaryXAxis: CategoryAxis(),
-        title: ChartTitle(text: 'Monthly Mood Distribution'),
+        title: ChartTitle(
+          text: 'Monthly Mood Distribution',
+          textStyle: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
         legend: Legend(isVisible: true),
         series: <CartesianSeries>[
           ColumnSeries<MoodData, String>(
@@ -195,36 +168,32 @@ class _MoodAnalyticsPageState extends State<MoodAnalyticsPage> {
   }
 
   void _showDayMoodDetails(DateTime selectedDay) {
-    // Normalize the day to remove time components
     final normalizedDay =
         DateTime(selectedDay.year, selectedDay.month, selectedDay.day);
 
-    // Find the mood for this specific day
-    final mood = _moodData.entries
-        .firstWhere(
-          (entry) =>
-              entry.key.year == normalizedDay.year &&
-              entry.key.month == normalizedDay.month &&
-              entry.key.day == normalizedDay.day,
-          orElse: () => MapEntry(normalizedDay, ''),
-        )
-        .value;
+    final mood = _moodData[normalizedDay] ?? '';
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Mood on ${selectedDay.toLocal()}'),
+        backgroundColor: const Color.fromARGB(255, 250, 160, 90),
+        title: Text(
+          'Mood on ${selectedDay.toLocal()}',
+          style: const TextStyle(color: Colors.white),
+        ),
         content: mood.isNotEmpty
             ? Image.asset(
                 _moodEmoticons[mood]!,
                 width: 70,
                 height: 70,
-                fit: BoxFit.cover,
               )
-            : Text('No mood recorded for this day'),
+            : const Text(
+                'No mood recorded for this day',
+                style: TextStyle(color: Colors.white),
+              ),
         actions: [
           TextButton(
-            child: Text('Close'),
+            child: const Text('Close', style: TextStyle(color: Colors.white)),
             onPressed: () => Navigator.of(context).pop(),
           )
         ],
@@ -236,7 +205,7 @@ class _MoodAnalyticsPageState extends State<MoodAnalyticsPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Add Mood'),
+        title: const Text('Add Mood'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: _moodEmoticons.entries
@@ -245,16 +214,13 @@ class _MoodAnalyticsPageState extends State<MoodAnalyticsPage> {
                       entry.value,
                       width: 30,
                       height: 30,
-                      fit: BoxFit.cover,
                     ),
                     title: Text(entry.key),
                     onTap: () {
-                      // Use a normalized DateTime (stripped time components)
                       DateTime today = DateTime.now();
                       final normalizedToday =
                           DateTime(today.year, today.month, today.day);
                       setState(() {
-                        // Add new mood for today
                         _moodData[normalizedToday] = entry.key;
                       });
                       Navigator.of(context).pop();

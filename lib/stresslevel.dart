@@ -20,9 +20,8 @@ class _PredictionButtonState extends State<PredictionButton> {
   String _prediction = '';
   String _uniqueId = '';  // New state variable to store the unique ID
 
-  // Function to send data to the backend and get the prediction
   Future<void> getPrediction(Map<String, dynamic> userInput) async {
-    const String url = "http://127.0.0.1:5000/predict"; // Local backend URL
+    const String url = "http://127.0.0.1:5000/predict";
 
     try {
       final response = await http.post(
@@ -32,9 +31,6 @@ class _PredictionButtonState extends State<PredictionButton> {
       );
 
       if (response.statusCode == 200) {
-        // Debugging: Print the raw response for inspection
-        print('Response body: ${response.body}');
-
         final result = jsonDecode(response.body);
         print('Decoded Response: $result');
         setState(() {
@@ -46,91 +42,151 @@ class _PredictionButtonState extends State<PredictionButton> {
         setState(() {
           _prediction = 'Error: ${response.statusCode}';
         });
-        print('Error: ${response.statusCode}');
       }
     } catch (e) {
       setState(() {
         _prediction = 'Error: $e';
       });
-      print('Error: $e');
     }
+  }
+
+  void _showGuide() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Guide to Enter Values'),
+          content: const SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("Gender: 1 for Male, 0 for Female"),
+                Text(
+                    "Occupation: 0 = Scientist, 1 = Doctor, 2 = Accountant, etc."),
+                Text(
+                    "BMI Category: 1 = Underweight, 2 = Normal, 3 = Overweight"),
+                Text("Sleep Duration: Hours of sleep per night"),
+                Text("Heart Rate: Beats per minute"),
+                Text("Daily Steps: Number of steps per day"),
+                Text("Systolic BP: Blood pressure in mmHg"),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Close', style: TextStyle(color: Colors.black)),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Stress Level Analysis')),
-      body: Padding(
-        padding: EdgeInsets.all(16.0),
+      appBar: AppBar(
+        title: const Text("Stress Level Analysis",
+            style: TextStyle(color: Colors.black)),
+        centerTitle: true,
+        backgroundColor: Colors.white,
+        elevation: 0,
+      ),
+      body: Container(
+        color: Colors.white,
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            TextField(
-              controller: _genderController,
-              decoration:
-                  InputDecoration(labelText: "Gender (1 = Male, 0 = Female)"),
-              keyboardType: TextInputType.number,
-            ),
-            TextField(
-              controller: _ageController,
-              decoration: InputDecoration(labelText: "Age"),
-              keyboardType: TextInputType.number,
-            ),
-            TextField(
-              controller: _occupationController,
-              decoration: InputDecoration(
-                  labelText: "Occupation (Enter code for occupation)"),
-              keyboardType: TextInputType.number,
-            ),
-            TextField(
-              controller: _sleepController,
-              decoration: InputDecoration(labelText: "Sleep Duration (hours)"),
-              keyboardType: TextInputType.numberWithOptions(decimal: true),
-            ),
-            TextField(
-              controller: _bmiController,
-              decoration: InputDecoration(labelText: "BMI Category"),
-              keyboardType: TextInputType.number,
-            ),
-            TextField(
-              controller: _heartRateController,
-              decoration: InputDecoration(labelText: "Heart Rate (beats/min)"),
-              keyboardType: TextInputType.number,
-            ),
-            TextField(
-              controller: _stepsController,
-              decoration: InputDecoration(labelText: "Daily Steps"),
-              keyboardType: TextInputType.number,
-            ),
-            TextField(
-              controller: _bpController,
-              decoration: InputDecoration(labelText: "Systolic BP (mmHg)"),
-              keyboardType: TextInputType.number,
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                final Map<String, dynamic> userInput = {
-                  "gender": int.parse(_genderController.text),
-                  "age": int.parse(_ageController.text),
-                  "occupation": int.parse(_occupationController.text),
-                  "sleep_duration": double.parse(_sleepController.text),
-                  "bmi_category": int.parse(_bmiController.text),
-                  "heart_rate": int.parse(_heartRateController.text),
-                  "daily_steps": int.parse(_stepsController.text),
-                  "systolic_bp": int.parse(_bpController.text),
-                };
+            _buildInputField(_genderController, "Gender"),
+            _buildInputField(_ageController, "Age"),
+            _buildInputField(_occupationController, "Occupation"),
+            _buildInputField(_sleepController, "Sleep Duration"),
+            _buildInputField(_bmiController, "BMI Category"),
+            _buildInputField(_heartRateController, "Heart Rate"),
+            _buildInputField(_stepsController, "Daily Steps"),
+            _buildInputField(_bpController, "Systolic BP"),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    final Map<String, dynamic> userInput = {
+                      "gender": int.parse(_genderController.text),
+                      "age": int.parse(_ageController.text),
+                      "occupation": int.parse(_occupationController.text),
+                      "sleep_duration": double.parse(_sleepController.text),
+                      "bmi_category": int.parse(_bmiController.text),
+                      "heart_rate": int.parse(_heartRateController.text),
+                      "daily_steps": int.parse(_stepsController.text),
+                      "systolic_bp": int.parse(_bpController.text),
+                    };
 
-                getPrediction(userInput);
-              },
-              child: Text('Get Prediction'),
+                    getPrediction(userInput);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 144, 102, 198),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 40, vertical: 15),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                  child: const Text("Get Prediction",
+                      style: TextStyle(fontSize: 18, color: Colors.white)),
+                ),
+                ElevatedButton(
+                  onPressed: _showGuide,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 250, 160, 90),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 40, vertical: 15),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                  child: const Text("Guide",
+                      style: TextStyle(fontSize: 18, color: Colors.white)),
+                ),
+              ],
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Text(
               'Prediction: $_prediction',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildInputField(TextEditingController controller, String label) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16.0),
+      child: TextField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: const TextStyle(color: Colors.black),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(
+              color: Color.fromARGB(255, 144, 102, 198),
+            ),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(
+              color: Color.fromARGB(255, 250, 160, 90),
+            ),
+          ),
+        ),
+        keyboardType: TextInputType.number,
       ),
     );
   }
