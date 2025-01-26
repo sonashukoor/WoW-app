@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:wow_app/timetrackerpage.dart';
 import 'login_page.dart';
 import 'moodtrack.dart'; // Import the MoodTrackPage
 
@@ -40,6 +41,15 @@ class HomePage extends StatelessWidget {
                 );
               },
               child: Text("Go to Mood Tracker"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => TimeEntryPage()),
+                );
+              },
+              child: Text("Go to Time Tracker"),
             ),
           ],
         ),
