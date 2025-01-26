@@ -46,6 +46,39 @@ class _PredictionButtonState extends State<PredictionButton> {
     }
   }
 
+  void _showGuide() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Guide to Enter Values'),
+          content: const SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("Gender: 1 for Male, 0 for Female"),
+                Text(
+                    "Occupation: 0 = Scientist, 1 = Doctor, 2 = Accountant, etc."),
+                Text(
+                    "BMI Category: 1 = Underweight, 2 = Normal, 3 = Overweight"),
+                Text("Sleep Duration: Hours of sleep per night"),
+                Text("Heart Rate: Beats per minute"),
+                Text("Daily Steps: Number of steps per day"),
+                Text("Systolic BP: Blood pressure in mmHg"),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Close', style: TextStyle(color: Colors.black)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -61,41 +94,58 @@ class _PredictionButtonState extends State<PredictionButton> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            _buildInputField(
-                _genderController, "Gender (1 = Male, 0 = Female)"),
+            _buildInputField(_genderController, "Gender"),
             _buildInputField(_ageController, "Age"),
-            _buildInputField(_occupationController, "Occupation (Enter code)"),
-            _buildInputField(_sleepController, "Sleep Duration (hours)"),
+            _buildInputField(_occupationController, "Occupation"),
+            _buildInputField(_sleepController, "Sleep Duration"),
             _buildInputField(_bmiController, "BMI Category"),
-            _buildInputField(_heartRateController, "Heart Rate (beats/min)"),
+            _buildInputField(_heartRateController, "Heart Rate"),
             _buildInputField(_stepsController, "Daily Steps"),
-            _buildInputField(_bpController, "Systolic BP (mmHg)"),
+            _buildInputField(_bpController, "Systolic BP"),
             const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                final Map<String, dynamic> userInput = {
-                  "gender": int.parse(_genderController.text),
-                  "age": int.parse(_ageController.text),
-                  "occupation": int.parse(_occupationController.text),
-                  "sleep_duration": double.parse(_sleepController.text),
-                  "bmi_category": int.parse(_bmiController.text),
-                  "heart_rate": int.parse(_heartRateController.text),
-                  "daily_steps": int.parse(_stepsController.text),
-                  "systolic_bp": int.parse(_bpController.text),
-                };
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    final Map<String, dynamic> userInput = {
+                      "gender": int.parse(_genderController.text),
+                      "age": int.parse(_ageController.text),
+                      "occupation": int.parse(_occupationController.text),
+                      "sleep_duration": double.parse(_sleepController.text),
+                      "bmi_category": int.parse(_bmiController.text),
+                      "heart_rate": int.parse(_heartRateController.text),
+                      "daily_steps": int.parse(_stepsController.text),
+                      "systolic_bp": int.parse(_bpController.text),
+                    };
 
-                getPrediction(userInput);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromARGB(255, 144, 102, 198),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
+                    getPrediction(userInput);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 144, 102, 198),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 40, vertical: 15),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                  child: const Text("Get Prediction",
+                      style: TextStyle(fontSize: 18, color: Colors.white)),
                 ),
-              ),
-              child: const Text("Get Prediction",
-                  style: TextStyle(fontSize: 18, color: Colors.white)),
+                ElevatedButton(
+                  onPressed: _showGuide,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 250, 160, 90),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 40, vertical: 15),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                  child: const Text("Guide",
+                      style: TextStyle(fontSize: 18, color: Colors.white)),
+                ),
+              ],
             ),
             const SizedBox(height: 20),
             Text(
